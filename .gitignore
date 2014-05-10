@@ -1,4 +1,5 @@
 # object files...
 *.o
 *.exe
+*.out
 
