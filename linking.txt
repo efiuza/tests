@@ -1,0 +1,121 @@
+Why libraries are used:
+This methodology, also known as "shared components" or "archive libraries", groups together multiple compiled object code files into a single file known as a library. Typically C functions/C++ classes and methods which can be shared by more than one application are broken out of the application's source code, compiled and bundled into a library. The C standard libraries and C++ STL are examples of shared components which can be linked with your code. The benefit is that each and every object file need not be stated when linking because the developer can reference the individual library. This simplifies the multiple use and sharing of software components between applications. It also allows application vendors a way to simply release an API to interface with an application. Components which are large can be created for dynamic use, thus the library remain separate from the executable reducing it's size and thus disk space used. The library components are then called by various applications for use when needed.
+
+Linux Library Types:
+There are two Linux C/C++ library types which can be created:
+
+Static libraries (.a): Library of object code which is linked with, and becomes part of the application.
+Dynamically linked shared object libraries (.so): There is only one form of this library but it can be used in two ways.
+Dynamically linked at run time but statically aware. The libraries must be available during compile/link phase. The shared objects are not included into the executable component but are tied to the execution.
+Dynamically loaded/unloaded and linked during execution (i.e. browser plug-in) using the dynamic linking loader system functions.
+Library naming conventions:
+
+Libraries are typically names with the prefix "lib". This is true for all the C standard libraries. When linking, the command line reference to the library will not contain the library prefix or suffix.
+Thus the following link command: gcc src-file.c -lm -lpthread 
+The libraries referenced in this example for inclusion during linking are the math library and the thread library. They are found in /usr/lib/libm.a and /usr/lib/libpthread.a.
+
+Note: The GNU compiler now has the command line option "-pthread" while older versions of the compiler specify the pthread library explicitly with "-lpthread". Thus now you are more likely to see gcc src-file.c -lm -pthread
+
+Static Libraries: (.a)
+How to generate a library:
+
+Compile: cc -Wall -c ctest1.c ctest2.c 
+Compiler options:
+-Wall: include warnings. See man page for warnings specified.
+Create library "libctest.a": ar -cvq libctest.a ctest1.o ctest2.o
+List files in library: ar -t libctest.a
+Linking with the library:
+cc -o executable-name prog.c libctest.a
+cc -o executable-name prog.c -L/path/to/library-directory -lctest
+Example files:
+ctest1.c
+void ctest1(int *i)
+{
+   *i=5;
+}
+            
+ctest2.c
+void ctest2(int *i)
+{
+   *i=100;
+}
+            
+prog.c
+#include <stdio.h>
+void ctest1(int *);
+void ctest2(int *);
+
+int main()
+{
+   int x;
+   ctest1(&x);
+   printf("Valx=%d\n",x);
+
+   return 0;
+}
+            
+Historical note: After creating the library it was once necessary to run the command: ranlib ctest.a. This created a symbol table within the archive. Ranlib is now embedded into the "ar" command.
+Note for MS/Windows developers: The Linux/Unix ".a" library is conceptually the same as the Visual C++ static ".lib" libraries.
+
+Dynamically Linked "Shared Object" Libraries: (.so)
+How to generate a shared object: (Dynamically linked object library file.) Note that this is a two step process.
+
+Create object code
+Create library
+Optional: create default version using a symbolic link.
+Library creation example:
+    gcc -Wall -fPIC -c *.c
+    gcc -shared -Wl,-soname,libctest.so.1 -o libctest.so.1.0   *.o
+    mv libctest.so.1.0 /opt/lib
+    ln -sf /opt/lib/libctest.so.1.0 /opt/lib/libctest.so.1
+    ln -sf /opt/lib/libctest.so.1.0 /opt/lib/libctest.so
+    
+This creates the library libctest.so.1.0 and symbolic links to it.
+It is also valid to cascade the linkage:
+
+    ln -sf /opt/lib/libctest.so.1.0 /opt/lib/libctest.so.1
+    ln -sf /opt/lib/libctest.so.1   /opt/lib/libctest.so
+    
+If you look at the libraries in /lib/ and /usr/lib/ you will find both methodologies present. Linux developers are not consistent. What is important is that the symbolic links eventually point to an actual library.
+Compiler options:
+
+-Wall: include warnings. See man page for warnings specified.
+-fPIC: Compiler directive to output position independent code, a characteristic required by shared libraries. Also see "-fpic".
+-shared: Produce a shared object which can then be linked with other objects to form an executable.
+-Wl,options: Pass options to linker. 
+In this example the options to be passed on to the linker are: "-soname libctest.so.1". The name passed with the "-o" option is passed to gcc.
+Option -o: Output of operation. In this case the name of the shared object to be output will be "libctest.so.1.0"
+Library Links:
+
+The link to /opt/lib/libctest.so allows the naming convention for the compile flag -lctest to work.
+The link to /opt/lib/libctest.so.1 allows the run time binding to work. See dependency below.
+Compile main program and link with shared object library:
+
+Compiling for runtime linking with a dynamically linked libctest.so.1.0:
+    gcc -Wall -I/path/to/include-files -L/path/to/libraries prog.c -lctest -o prog
+Use:
+    gcc -Wall -L/opt/lib prog.c -lctest -o prog
+      
+Where the name of the library is libctest.so. (This is why you must create the symbolic links or you will get the error "/usr/bin/ld: cannot find -lctest".) 
+The libraries will NOT be included in the executable but will be dynamically linked during runtime execution.
+List Dependencies:
+
+The shared library dependencies of the executable can be listed with the command: ldd name-of-executable
+
+Example: ldd prog
+        libctest.so.1 => /opt/lib/libctest.so.1 (0x00002aaaaaaac000)
+        libc.so.6 => /lib64/tls/libc.so.6 (0x0000003aa4e00000)
+        /lib64/ld-linux-x86-64.so.2 (0x0000003aa4c00000)
+    
+Run Program:
+
+Set path: export LD_LIBRARY_PATH=/opt/lib:$LD_LIBRARY_PATH
+Run: prog
+Man Pages:
+
+gcc - GNU C compiler
+ld - The GNU Linker
+ldd - List dependencies
+Links:
+
+LDP: Shared libraries
