@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html ng-app>
+    <head>
+        <title>Hello AngularJS</title>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.4/angular.min.js"></script>
+        <script type="text/javascript" src="simpleController.js"></script>
+    </head>
+    <body ng-controller="simpleController">
+        <h1>Counter: {{data.counter}}</h1>
+        <hr />
+        <button ng-click="handlers.incrementCounter()">Increment Counter</button>
+        <button ng-click="handlers.decrementCounter()">Decrement Counter</button>
+        <br />
+        <span ng-show="data.warning.visible">{{data.warning.text}}</span>
+    </body>
+</html>
