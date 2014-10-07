@@ -23,6 +23,11 @@ public class CanvasStudy extends Canvas implements KeyListener {
      * Private Members
      */
 
+    private static int drawCount   = 0;
+    private static int updateCount = 0;
+    private static int paintCount  = 0;
+    private static int colorCount  = 0;
+
     private Color color;
 
     /*
@@ -45,6 +50,7 @@ public class CanvasStudy extends Canvas implements KeyListener {
         g = (int)(Math.random() * 256.0);
         b = (int)(Math.random() * 256.0);
         this.color = new Color(r, g, b);
+        System.out.printf(">> GENERATE_RANDOM_COLOR #%04d\n", ++colorCount);
     }
 
     /*
@@ -65,20 +71,23 @@ public class CanvasStudy extends Canvas implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-        System.out.println(">> KEYRELEASED");
+        System.out.println(">> KEY_RELEASED");
         this.generateRandomColor();
         this.repaint();
+        System.out.println("...repaint scheduled.");
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3500);
         } catch (InterruptedException ex) {
-            System.out.println("...interrupted");
+            System.out.println("...sleep interrupted.");
             ex.printStackTrace();
         }
+        System.out.println("...just woke up!");
     }
 
     // Graphics
 
     public void draw(Graphics g) {
+        System.out.printf(">> DRAW #%04d, #%04d\n", ++drawCount, colorCount);
         g.setColor(this.color);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
@@ -87,14 +96,22 @@ public class CanvasStudy extends Canvas implements KeyListener {
 
     @Override
     public void paint(Graphics g) {
-        System.out.println(">> PAINT");
+        System.out.printf(">> PAINT #%04d\n", ++paintCount);
+        System.out.printf("...Size: %s\n", this.getSize());
+        System.out.printf("...Location: %s\n", this.getLocation());
+        System.out.printf("...Clip: %s\n", g.getClip());
+        System.out.printf("...Clip Bounds: %s\n", g.getClipBounds());
         // (new Exception()).printStackTrace();
         this.draw(g);
     }
 
     @Override
     public void update(Graphics g) {
-        System.out.println(">> UPDATE");
+        System.out.printf(">> UPDATE #%04d\n", ++updateCount);
+        System.out.printf("...Size: %s\n", this.getSize());
+        System.out.printf("...Location: %s\n", this.getLocation());
+        System.out.printf("...Clip: %s\n", g.getClip());
+        System.out.printf("...Clip Bounds: %s\n", g.getClipBounds());
         // (new Exception()).printStackTrace();
         this.draw(g);
     }
