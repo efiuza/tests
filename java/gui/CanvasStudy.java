@@ -3,7 +3,9 @@ import java.lang.Object;
 import java.lang.String;
 import java.lang.Math;
 import java.lang.System;
+import java.lang.Thread;
 import java.lang.Exception;
+import java.lang.InterruptedException;
 
 import java.awt.Window;
 import java.awt.Frame;
@@ -63,8 +65,15 @@ public class CanvasStudy extends Canvas implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        System.out.println(">> KEYRELEASED");
         this.generateRandomColor();
         this.repaint();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex) {
+            System.out.println("...interrupted");
+            ex.printStackTrace();
+        }
     }
 
     // Graphics
@@ -79,14 +88,14 @@ public class CanvasStudy extends Canvas implements KeyListener {
     @Override
     public void paint(Graphics g) {
         System.out.println(">> PAINT");
-        (new Exception()).printStackTrace();
+        // (new Exception()).printStackTrace();
         this.draw(g);
     }
 
     @Override
     public void update(Graphics g) {
         System.out.println(">> UPDATE");
-        (new Exception()).printStackTrace();
+        // (new Exception()).printStackTrace();
         this.draw(g);
     }
 
