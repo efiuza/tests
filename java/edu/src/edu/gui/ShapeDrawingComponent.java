@@ -29,11 +29,10 @@ final class ShapeDrawingComponent extends Component {
 
     private Shape getShapePath(float x, float y, float width, float height) {
         //return (new Ellipse2D.Float(x, y, width, height));
-        AffineTransform transform;
+        AffineTransform transform = new AffineTransform();
         Path2D path = this.buildPath();
-        Rectangle2D.Float bounds = new Rectangle2D.Float();
+        Rectangle2D.Float bounds = (Rectangle2D.Float)path.getBounds2D();
         float scale, sRatio, bRatio;
-        bounds.setRect(path.getBounds2D());
         sRatio = bounds.height / bounds.width;
         bRatio = height / width;
         if (bRatio > sRatio) {
@@ -41,9 +40,10 @@ final class ShapeDrawingComponent extends Component {
         } else {
             scale = height / bounds.height;
         }
-        transform = AffineTransform.getScaleInstance((double)scale, (double)scale);
-        transform.translate(1.0, 1.0);
+        transform.setToScale((double)scale, (double)scale);
         path.transform(transform);
+        //transform.setToTranslation(1.0, 1.0);
+        //path.transform(transform);
         return path;
     }
 
