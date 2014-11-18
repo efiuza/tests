@@ -4,7 +4,7 @@
 
 #define LENGTH 8
 
-void swap(void *, void *, size_t);
+void swap(void *, void *, long);
 static void copy(char *, char*);
 
 int main(int argc, char *argv[]) {
@@ -61,13 +61,12 @@ static void copy(char *a, char *b) {
 
 }
 
-void swap(void *a, void *b, size_t size) {
-    char buf;
-    while (size > 0) {
-        --size;
-        buf = *((char *)a + size);
+void swap(void *a, void *b, long size) {
+    char tmp;
+    while (size-- > 0) {
+        tmp = *((char *)a + size);
         *((char *)a + size) = *((char *)b + size);
-        *((char *)b + size) = buf;
+        *((char *)b + size) = tmp;
     }
 }
 
