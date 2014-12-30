@@ -64,11 +64,10 @@ int main(int argc, char *argv[])
 #ifdef _IMPL_HARD
       (tea + i - 1)->next = (struct task_entry *)((char *)tea + sizeof(struct task_entry) * i);
 #else
-      /* alternative... */
-      tea[i - 1].next = tea + i;
+      tea[i - 1].next = &tea[i];
 #endif
 #else
-      tea[i - 1].next = &tea[i];
+      tea[i - 1].next = tea + i;
 #endif
       --i;
     }
