@@ -26,6 +26,44 @@ enum	{
 	KLEENE		/* rules!	*/
 };
 
+static void _my_dump(const unsigned char *buf) {
+
+	#define _MY_BUFSZ 1024
+
+	unsigned char *s, bufcopy[_MY_BUFSZ];
+        int i, j, p, c;
+	for (i = 0, p = 0; p < _MY_BUFSZ && (c = *(buf + i)) > 0; ++i) {
+		switch (c) {
+			case LPAREN:
+			case RPAREN:
+			case ALTERN:
+			case CONCAT:
+			case KLEENE:
+				if (c == LPAREN)
+					s = (unsigned char *)"{LPAREN}";
+				else if (c == RPAREN)
+					s = (unsigned char *)"{RPAREN}";
+				else if (c == ALTERN)
+					s = (unsigned char *)"{ALTERN}";
+				else if (c == CONCAT)
+					s = (unsigned char *)"{CONCAT}";
+				else if (c == KLEENE)
+					s = (unsigned char *)"{KLEENE}";
+				for (j = 0; p < _MY_BUFSZ && (c = *(s + j)) > 0; ++j)
+					bufcopy[p++] = (unsigned char)c;
+				break;
+			default:
+				if (c < ' ')
+					c = '*';
+				bufcopy[p++] = (unsigned char)c;
+		}
+	}
+
+	bufcopy[p++] = '\0';
+	puts((char *)bufcopy);
+
+}
+
 unsigned char *prepare (const char *src)
 {
 	unsigned char	escape[CHAR_MAX + 1] = "";
@@ -79,6 +117,8 @@ unsigned char *prepare (const char *src)
 	dest[j++] = RPAREN;
 	dest[j++] = '\0';
 
+	_my_dump(dest);
+
 	return	dest;
 }
 
@@ -119,6 +159,8 @@ unsigned char *convert (const char *src)
 
 	}
 	dest[j++] = '\0';
+
+	_my_dump(dest);
 
 	return	dest;
 }
@@ -277,10 +319,13 @@ int main (void)
 		{ NULL,		NULL		}
 	};
 
+	int char_max = CHAR_MAX;
+	printf("CHAR_MAX: %d\n", char_max);
+
 	for (i = 0; test[i].re; i++) {
 
 		struct	instr	*this = study (test[i].re);
-
+		dump_code(this);
 		printf ("%s %s /%s/\n",
 				test[i].s,
 				execute (this, test[i].s) ? "~" : "!~",
