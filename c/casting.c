@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     if ( (chr == 'a' || chr == 'b' || chr == 'c') && str[1] == ':' ) {
        str += 2;
        if ( chr == 'b' || chr == 'c' )
-         op = chr == 'c' ? &_opc : &_opb;
+         op = chr == 'b' ? &_opb : &_opc;
     }
     tep->task.data = (void *)str;
     tep->task.operation = op;
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
   tep = &mte, i = 1;
   do {
     printf("TASK #%d\n", i++);
-    tep->task.operation(tep->task.data);
+    (*tep->task.operation)(tep->task.data);
     puts("DONE!");
   } while ( (tep = tep->next) != NULL );
 
